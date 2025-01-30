@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Loader, AlertCircle, CheckCircle } from "lucide-react";
+import { useRef } from "react";
 
 interface Video {
   id: string;
@@ -92,7 +93,7 @@ export default function Videos() {
   const [file, setFile] = useState<File | null>(null);
 
   return (
-    <div className="p-6 max-w-4xl mx-auto bg-white shadow-md rounded-lg">
+    <div className="p-6 max-w-5xl mx-auto bg-white shadow-md rounded-lg">
       <h1 className="text-2xl font-bold text-center mb-6 text-gray-800">Video Manager</h1>
       <div className="flex flex-col md:flex-row items-center gap-4 mb-6">
         <Input type="file" accept="video/*" onChange={(e) => setFile(e.target.files?.[0] || null)} className="border rounded-lg p-2 w-full" />
@@ -106,11 +107,11 @@ export default function Videos() {
       {loading && <p className="text-blue-500 text-center">Loading...</p>}
       {error && <p className="text-red-500 flex items-center gap-2"><AlertCircle /> {error}</p>}
       {success && <p className="text-green-500 flex items-center gap-2"><CheckCircle /> {success}</p>}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 gap-6">
         {videos.map((video) => (
           <Card key={video.id} className="p-4 bg-gray-100 rounded-lg shadow-lg">
             <CardContent>
-              <video controls className="w-full rounded-lg">
+              <video loop controls autoPlay className="w-full rounded-lg">
                 <source src={video.url} type="video/mp4" />
               </video>
               <p className="text-sm mt-2 font-semibold text-gray-700">{video.name}</p>
