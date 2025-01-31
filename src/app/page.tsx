@@ -1,101 +1,190 @@
+"use client"
+import { useRef, useState, useEffect } from "react";
 import Image from "next/image";
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const posts = [
+    {
+      postsrc: "/cdt.mp4",
+      profilesrc: "/lia.jpg",
+      username: "wisauce",
+      caption: "aduhai ceweku cantik sekali kok bisa ya allahuakbar keren banget dah pokoknya",
+    },   // like comment
+    {
+      postsrc: "/case.jpg",
+      profilesrc: "/lia.jpg",
+      username: "john_doe",
+      caption: "Sungguh indah pemandangan pagi ini, tak terlupakan!",
+    },
+    {
+      postsrc: "/abrar.mp4",
+      profilesrc: "/lia.jpg",
+      username: "susan_m",
+      caption: "Waktu berlalu begitu cepat, kenangan tetap abadi.",
+    },
+    {
+      postsrc: "/lia.jpg",
+      profilesrc: "/lia.jpg",
+      username: "k3vin",
+      caption: "Gokil sih, hari ini seru banget! Gaspol terus!",
+    },
+    {
+      postsrc: "/lialia.mp4",
+      profilesrc: "/lia.jpg",
+      username: "annabelle",
+      caption: "Momen kecil yang membuat hidup lebih berwarna 🌸",
+    },
+    {
+      postsrc: "/gapakelama.mp4",
+      profilesrc: "/lia.jpg",
+      username: "mystic99",
+      caption: "Menatap bintang di langit, memikirkan masa depan.",
+    },
+  ];  
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
+  const [expandCaption, setExpandCaption] = useState(false);
+  const handleClick = () => {
+    setExpandCaption(!expandCaption);
+  };
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  // Set up IntersectionObserver to detect when videos are in view
+  useEffect(() => {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        const video = entry.target as HTMLVideoElement;
+
+        if (entry.isIntersecting) {
+          video.play();
+        } else {
+          video.pause();
+        }
+      });
+    }, { threshold: 0.5 }); // 50% of the video must be visible
+
+    videoRefs.current.forEach((video) => {
+      if (video) observer.observe(video);
+    });
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
+  return (
+<div className="flex flex-col bg-black h-screen overflow-y-auto snap-mandatory snap-y relative">
+  {/* Video container with vertical scroll */}
+  <div
+    ref={containerRef}
+    className="flex flex-col h-full w-full scroll-smooth no-scrollbar"
+  >
+    {posts.map((item, i) => (
+      item.postsrc.toLowerCase().endsWith(".mp4") ? (
+        <div className="relative snap-start flex-shrink-0 w-full h-screen" key={i}>
+          <video
+            ref={(el) => (videoRefs.current[i] = el)}
+            className="object-contain w-full h-full"
+            controls
+            loop
+            playsInline
+            autoPlay // Auto play is controlled by IntersectionObserver
+            src={item.postsrc}
+          />
+          <div className="absolute bottom-0 w-full">
+            <div className="flex items-center">
+              <div className="relative w-[44px] h-[44px] rounded-full">
+              <Image
+                src={item.profilesrc}
+                fill
+                alt="yah"
+                className="object-cover rounded-full"
+              />
+              </div>
+                <h3 className="text-white text-[14px] font-bold">{item.username}</h3>
+            </div>
+            <div className="flex-col">
+              <p className={expandCaption ? "text-white overflow-hidden" : "text-white text-ellipsis text-nowrap overflow-hidden" }>{item.caption}</p>
+              <p className="text-gray-400" onClick={handleClick}>See more</p>
+            </div>
+            <div className="flex text-white justify-around w-full items-center h-28">
+              <Image
+                src="/menu-star.svg"
+                width={32}
+                height={32}
+                alt="yah"
+              />
+              <Image
+                src="/menu-comment.svg"
+                width={32}
+                height={32}
+                alt="yah"
+              />
+              <Image
+                src="/menu-share.svg"
+                width={32}
+                height={32}
+                alt="yah"
+              />
+              <Image
+                src="/menu-bookmark.svg"
+                width={32}
+                height={32}
+                alt="yah"
+              />
+            </div>
+          </div>
+                </div>
+              ) : (
+                <div className="relative snap-start flex-shrink-0 w-full h-screen" key={i}>
+                  <img className="object-contain w-full h-full" src={item.postsrc} alt="Image" />
+                  <div className="absolute bottom-0 w-full">
+                    <div className="flex items-center">
+                      <div className="relative w-[44px] h-[44px] rounded-full">
+                      <Image
+                        src={item.profilesrc}
+                        fill
+                        alt="yah"
+                        className="object-cover rounded-full"
+                      />
+                      </div>
+                        <h3 className="text-white text-[14px] font-bold">{item.username}</h3>
+                    </div>
+                    <div className="flex-col">
+                      <p className={expandCaption ? "text-white overflow-hidden" : "text-white text-ellipsis text-nowrap overflow-hidden" }>{item.caption}</p>
+                      <p className="text-gray-400" onClick={handleClick}>See more</p>
+                    </div>
+                    <div className="flex text-white justify-around w-full items-center h-28">
+                      <Image
+                        src="/menu-star.svg"
+                        width={32}
+                        height={32}
+                        alt="yah"
+                      />
+                      <Image
+                        src="/menu-comment.svg"
+                        width={32}
+                        height={32}
+                        alt="yah"
+                      />
+                      <Image
+                        src="/menu-share.svg"
+                        width={32}
+                        height={32}
+                        alt="yah"
+                      />
+                      <Image
+                        src="/menu-bookmark.svg"
+                        width={32}
+                        height={32}
+                        alt="yah"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )
+            ))}
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+
   );
 }
